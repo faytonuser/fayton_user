@@ -48,7 +48,7 @@ dependencies:
     flutter_spinkit: ^5.2.0
     flare_flutter: ^3.0.2
     json_annotation:
-    flutter_local_notifications: ^17.0.1
+    flutter_local_notifications: ^17.2.2
     geolocator: ^11.0.0
     flutter_phone_direct_caller: ^2.1.1
     google_maps_flutter: ^2.5.3
@@ -103,12 +103,18 @@ flutter_launcher_icons:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+dependency_overrides:
+    win32: ^5.5.4
+
 # The following section is specific to Flutter packages.
 flutter:
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in
     # the material Icons class.
     uses-material-design: true
+
+
+
 
     # To add assets to your application, add an assets section, like this:
     assets:
