@@ -23,6 +23,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _fromRouteController = TextEditingController();
+  final _toRouteController = TextEditingController();
+  final _dateController = TextEditingController();
+
+  String? _fromRouteError;
+  String? _toRouteError;
+  String? _dateError;
+
+  void _validateForm() {
+    setState(() {
+      _fromRouteError = _fromRouteController.text.isEmpty
+          ? 'Zəhmət olmasa gediş şəhərini seçin'
+          : null;
+      _toRouteError = _toRouteController.text.isEmpty
+          ? 'Zəhmət olmasa gedəcəyiniz şəhəri seçin'
+          : null;
+      _dateError = _dateController.text.isEmpty
+          ? 'Zəhmət olmasa gediş tarixini seçin'
+          : null;
+    });
+  }
+
   bool isAllVisit = false;
 
   Future<void> checkLocationPermission() async {
@@ -65,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 48.0, right: 48, bottom: 24),
               child: CustomTextField(
-                controller: TextEditingController(text: routeProvider.selectedFromRoute?.title ?? ""),
+                controller: _fromRouteController,
                 hintText: "Gediş şəhərini seçin",
                 readOnly: true,
                 style: GoogleFonts.poppins(color: Colors.white38),
@@ -73,17 +95,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   FontAwesomeIcons.route,
                   color: Colors.white38,
                 ),
+                errorText: _fromRouteError,
                 onTap: () {
                   showMaterialSelectionPicker<StateModel?>(
                     context: context,
                     cancelText: "Ləğv et",
                     confirmText: "Təsdiqlə",
                     title: 'Gediş şəhərini seçin',
-                    items: StateModel.townModels.followedBy(StateModel.villageModels).followedBy(StateModel.subwayStationModels).toList(),
+                    items: StateModel.townModels
+                        .followedBy(StateModel.villageModels)
+                        .followedBy(StateModel.subwayStationModels)
+                        .toList(),
                     transformer: (item) => (item?.title),
                     iconizer: (item) => item?.icon,
                     selectedItem: routeProvider.selectedFromRoute,
-                    onChanged: (value) => setState(() => routeProvider.selectedFromRoute = value),
+                    onChanged: (value) => setState(() {
+                      routeProvider.selectedFromRoute = value;
+                      _fromRouteController.text = value?.title ?? '';
+                      _fromRouteError = null;
+                    }),
                   );
                 },
               ),
@@ -92,68 +122,80 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.only(left: 48.0, right: 48, bottom: 24),
               child: CustomTextField(
                 style: GoogleFonts.poppins(color: Colors.white38),
-                controller: TextEditingController(text: routeProvider.selectedToRoute?.title ?? ""),
+                controller: _toRouteController,
                 hintText: "Gedəcəyiniz şəhəri seçin",
                 readOnly: true,
                 prefixIcon: FaIcon(
                   FontAwesomeIcons.route,
                   color: Colors.white38,
                 ),
+                errorText: _toRouteError,
                 onTap: () {
                   showMaterialSelectionPicker<StateModel?>(
                     context: context,
                     cancelText: "Ləğv et",
                     confirmText: "Təsdiqlə",
-                    items: StateModel.townModels.followedBy(StateModel.villageModels).followedBy(StateModel.subwayStationModels).toList(),
+                    title: "Gedəcəyiniz şəhəri seçin",
+                    items: StateModel.townModels
+                        .followedBy(StateModel.villageModels)
+                        .followedBy(StateModel.subwayStationModels)
+                        .toList(),
                     transformer: (item) => (item?.title),
                     iconizer: (item) => item?.icon,
                     selectedItem: routeProvider.selectedToRoute,
-                    onChanged: (value) => setState(() => routeProvider.selectedToRoute = value),
+                    onChanged: (value) => setState(() {
+                      routeProvider.selectedToRoute = value;
+                      _toRouteController.text = value?.title ?? '';
+                      _toRouteError = null;
+                    }),
                   );
                 },
               ),
             ),
             !isAllVisit
                 ? Padding(
-                    padding: const EdgeInsets.only(left: 48.0, right: 48, bottom: 24),
+                    padding: const EdgeInsets.only(
+                        left: 48.0, right: 48, bottom: 24),
                     child: CustomTextField(
-                      controller: TextEditingController(),
+                      controller: _dateController,
                       hintText: routeProvider.selectedStartDate == null
-                          ? "Başlama tarixi"
-                          : Utils.getFormatedDate(routeProvider.selectedStartDate.toString()),
+                          ? "Gediş tarixi"
+                          : Utils.getFormatedDate(
+                              routeProvider.selectedStartDate.toString()),
                       readOnly: true,
                       prefixIcon: FaIcon(
                         FontAwesomeIcons.calendarCheck,
                         color: Colors.white38,
                       ),
+                      errorText: _dateError,
                       onTap: () async {
-                        await showMaterialDatePicker(
-                            title: "Vaxtı seçin",
-                            cancelText: "Ləğv et",
-                            confirmText: "Təsdiqlə",
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(Duration(days: 365)),
-                            context: context,
-                            selectedDate: routeProvider.selectedStartDate ?? DateTime.now(),
-                            onChanged: (value) => routeProvider.selectedStartDate = value,
-                            onConfirmed: () async {});
+                        DateTime? selectedDate = await showMaterialDatePicker(
+                          title: "Vaxtı seçin",
+                          cancelText: "Ləğv et",
+                          confirmText: "Təsdiqlə",
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(Duration(days: 365)),
+                          context: context,
+                          selectedDate:
+                              routeProvider.selectedStartDate ?? DateTime.now(),
+                          onChanged: (value) {
+                            routeProvider.selectedStartDate = value;
+                          },
+                          onConfirmed: () async {},
+                        );
+
+                        if (selectedDate != null) {
+                          _dateController.text =
+                              Utils.getFormatedDate(selectedDate.toString());
+                          setState(() {
+                            routeProvider.selectedStartDate = selectedDate;
+                            _dateError = null;
+                          });
+                        }
                       },
                     ),
                   )
                 : SizedBox(),
-            /**      CheckboxListTile(
-              contentPadding:
-              const EdgeInsets.only(right: 48, left: 48),
-              title: Text("Bütün səfərlərə baxın", style: GoogleFonts.poppins(color: Colors.white70),),
-              onChanged: (value) {
-                setState(() {
-                  isAllVisit = value ?? false;
-                });
-              },
-              activeColor: AppColors.primaryColor,
-              value: isAllVisit,
-              controlAffinity: ListTileControlAffinity.leading,
-            ),*/
             SizedBox(
               height: 24,
             ),
@@ -161,18 +203,24 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.only(left: 48.0, right: 48),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FilterScreen(
-                        endDate: routeProvider.selectedEndDate,
-                        from: routeProvider.selectedFromRoute?.title ?? "TR",
-                        startDate: routeProvider.selectedStartDate,
-                        to: routeProvider.selectedToRoute?.title ?? "TR",
-                        isAllVisit: isAllVisit,
+                  _validateForm();
+
+                  if (_fromRouteError == null &&
+                      _toRouteError == null &&
+                      _dateError == null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FilterScreen(
+                          endDate: routeProvider.selectedEndDate,
+                          from: routeProvider.selectedFromRoute?.title ?? "TR",
+                          startDate: routeProvider.selectedStartDate,
+                          to: routeProvider.selectedToRoute?.title ?? "TR",
+                          isAllVisit: isAllVisit,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 },
                 child: CustomButton(
                   text: "Axtar",
@@ -184,5 +232,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _fromRouteController.dispose();
+    _toRouteController.dispose();
+    _dateController.dispose();
+    super.dispose();
   }
 }

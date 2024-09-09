@@ -6,10 +6,12 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/providers/auth_provider.dart';
@@ -36,16 +38,15 @@ void main() async {
     null,
     [
       NotificationChannel(
-        channelGroupKey: 'reminders',
-        channelKey: 'instant_notification',
-        channelName: 'Basic Instant Notification',
-        channelDescription: 'Notification channel that can trigger notification instantly.',
-        defaultColor: const Color(0xff32485E),
-        importance: NotificationImportance.High,
-        playSound: false,
-        onlyAlertOnce: false,
-        enableVibration: true,
-      ),
+          channelGroupKey: 'reminders',
+          channelKey: 'instant_notification',
+          channelName: 'Basic Instant Notification',
+          channelDescription: 'Notification channel that can trigger notification instantly.',
+          defaultColor: const Color(0xff32485E),
+          importance: NotificationImportance.High,
+          playSound: false,
+          onlyAlertOnce: false,
+          enableVibration: true),
     ],
   );
   Notify.startListeningNotificationEvents();
@@ -58,7 +59,8 @@ Future<void> initializeService() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'my_foreground', // id
     'MY FOREGROUND SERVICE', // title
-    description: 'This channel is used for important notifications.', // description
+    description: 'This channel is used for important notifications.',
+    // description
     importance: Importance.low, // importance must be at low or higher level
   );
 
@@ -83,8 +85,8 @@ Future<void> initializeService() async {
       onStart: onStart,
 
       // auto start service
-      autoStart: true,
-      isForegroundMode: false,
+      autoStart: false,
+      isForegroundMode: kDebugMode,
       notificationChannelId: 'my_foreground',
       initialNotificationTitle: 'MY FOREGROUND SERVICE',
       initialNotificationContent: 'This channel is used for important notifications.',
@@ -135,18 +137,15 @@ void onStart(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  /// OPTIONAL when use custom notification
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  if (service is AndroidServiceInstance) {
-    service.on('setAsForeground').listen((event) {
-      service.setAsForegroundService();
-    });
-
-    service.on('setAsBackground').listen((event) {
-      service.setAsBackgroundService();
-    });
-  }
+  // if (service is AndroidServiceInstance) {
+  //   service.on('setAsForeground').listen((event) {
+  //     service.setAsForegroundService();
+  //   });
+  //
+  //   service.on('setAsBackground').listen((event) {
+  //     service.setAsBackgroundService();
+  //   });
+  // }
 
   service.on('stopService').listen((event) {
     service.stopSelf();
@@ -237,6 +236,15 @@ class MyApp extends StatelessWidget {
         ),
         home: SplashScreen(),
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('az', null),
+        ],
+        locale: const Locale('Az'),
       ),
     );
   }

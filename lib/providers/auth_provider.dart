@@ -317,11 +317,12 @@ class AuthProvider extends ChangeNotifier {
 
       return credential;
     } on FirebaseAuthException catch (e) {
+      print("LOGIN ERROR CODE  ******   ${e.code}");
       isLoading = false;
       if (e.code == 'user-not-found') {
         throw Exception('Bu hesab mövcud deyil.');
       } else if (e.code == 'wrong-password') {
-        throw Exception('Parol doğru deyil');
+        throw Exception('Parol yalnışdır zəhmət olmasa parolu yenidən daxil edin');
       } else if (e.code == 'user-disabled') {
         throw Exception('İstifadəçi hesabı administrator tərəfindən deaktiv edilmişdir.');
       } else if (e.code == 'too-many-requests') {

@@ -24,6 +24,7 @@ class _SignupScreenState extends State<EditProfileScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _oldpasswordController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfirmationController = TextEditingController();
   final TextEditingController _deletePasswordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   bool _isLoading = false;
@@ -40,6 +41,7 @@ class _SignupScreenState extends State<EditProfileScreen> {
     _deletePasswordController.dispose();
     _oldpasswordController.dispose();
     _usernameController.dispose();
+    _passwordConfirmationController.dispose();
   }
 
   @override
@@ -59,7 +61,7 @@ class _SignupScreenState extends State<EditProfileScreen> {
         newpassword: _passwordController.text,
       );
       // if string returned is sucess, user has been created
-      if (res == "Kaydedildi") {
+      if (res == "Şifrə uğurla yeniləndi.") {
         setState(() {
           _isLoading = false;
         });
@@ -163,7 +165,7 @@ class _SignupScreenState extends State<EditProfileScreen> {
                         ? Column(
                             children: [
                               TextFieldInput(
-                                hintText: 'Mevcut Şifrə',
+                                hintText: 'Cari Şifrə',
                                 textInputType: TextInputType.text,
                                 textEditingController: _oldpasswordController,
                                 isPass: true,
@@ -175,6 +177,15 @@ class _SignupScreenState extends State<EditProfileScreen> {
                                 hintText: 'Yeni Şifrə',
                                 textInputType: TextInputType.text,
                                 textEditingController: _passwordController,
+                                isPass: true,
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              TextFieldInput(
+                                hintText: 'Yeni Şifrə Təkrarı',
+                                textInputType: TextInputType.text,
+                                textEditingController: _passwordConfirmationController,
                                 isPass: true,
                               ),
                             ],

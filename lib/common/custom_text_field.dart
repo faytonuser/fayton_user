@@ -21,6 +21,8 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final TextStyle? style;
   final bool? obsucure;
+  final String? errorText;
+
   const CustomTextField({
     Key? key,
     required,
@@ -41,6 +43,7 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.style,
     this.obsucure,
+    this.errorText,
   }) : super(key: key);
 //
   @override
@@ -67,6 +70,7 @@ class CustomTextField extends StatelessWidget {
           borderSide: BorderSide(color: AppColors.primaryColor),
         ),
         hintText: hintText,
+        errorText: errorText,
         hintStyle: GoogleFonts.poppins(color: Colors.white70),
         suffixIcon: suffixIcon == null
             ? null
